@@ -9,7 +9,7 @@ class LicenseViewModel: ObservableObject {
         case licensed
     }
     
-    @Published private(set) var licenseState: LicenseState = .trial(daysRemaining: 7)  // Default to trial
+    @Published private(set) var licenseState: LicenseState = .licensed  // Always licensed - bypass all checks
     @Published var licenseKey: String = ""
     @Published var isValidating = false
     @Published var validationMessage: String?
@@ -33,6 +33,15 @@ class LicenseViewModel: ObservableObject {
     }
     
     private func loadLicenseState() {
+        // License check bypassed - always set to licensed
+        licenseState = .licensed
+        
+        // Load existing license key if present for UI display
+        if let licenseKey = userDefaults.licenseKey {
+            self.licenseKey = licenseKey
+        }
+        
+        /* Original license checking logic - commented out
         // Check for existing license key
         if let licenseKey = userDefaults.licenseKey {
             self.licenseKey = licenseKey
@@ -67,15 +76,11 @@ class LicenseViewModel: ObservableObject {
             // No trial has been started yet - start it now
             startTrial()
         }
+        */
     }
     
     var canUseApp: Bool {
-        switch licenseState {
-        case .licensed, .trial:
-            return true
-        case .trialExpired:
-            return false
-        }
+        return true  // Always allow app usage - bypass license check
     }
     
     func openPurchaseLink() {
